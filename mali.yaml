@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: '2010-09-09'
-# This is the final commit to prove pipeline automation
+# This is the ffinal commit to prove automation
 
 Resources:
   VPC:
