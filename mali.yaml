@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: '2010-09-09'
-# This is the final commit to prove AUTOMATION
+# This is the final commit 
 
 Resources:
   VPC:
@@ -205,7 +205,7 @@ Resources:
       RouteTableIds:
         - !Ref RouteTablePrivate
 
-  ## CLOUDWATCH MONITORING MECHANISM ##
+  ## CLOUDWATCH MONITORING ##
   CloudWatchAlarmEC2CPU:
     Type: AWS::CloudWatch::Alarm
     Properties:
