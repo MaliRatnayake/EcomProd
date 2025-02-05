@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: '2010-09-09'
-# This is the ffinal commit to prove automation
+# This is the final commit to prove automation
 
 Resources:
   VPC:
@@ -175,7 +175,7 @@ Resources:
       SecurityGroupIds:
         - !Ref SecurityGroup
       SubnetId: !Ref PrivateSubnet1
-      ImageId: ami-04b4f1a9cf54c11d0  # Fixed: Hardcoded AMI ID
+      ImageId: ami-04b4f1a9cf54c11d0
       KeyName: ecom
       IamInstanceProfile: !Ref InstanceProfile
       Tags:
@@ -204,6 +204,57 @@ Resources:
       VpcEndpointType: Gateway
       RouteTableIds:
         - !Ref RouteTablePrivate
+
+  ## CLOUDWATCH MONITORING MECHANISM ##
+  CloudWatchAlarmEC2CPU:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmDescription: "Triggers when EC2 CPU utilization exceeds 75%"
+      Namespace: AWS/EC2
+      MetricName: CPUUtilization
+      Dimensions:
+        - Name: InstanceId
+          Value: !Ref EC2Instance
+      Statistic: Average
+      Period: 300
+      EvaluationPeriods: 1
+      Threshold: 75
+      ComparisonOperator: GreaterThanThreshold
+      AlarmActions:
+        - !Ref SNSTopic
+      OKActions:
+        - !Ref SNSTopic
+
+  CloudWatchAlarmALBRequests:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmDescription: "Triggers when ALB request count exceeds 100,000 within 5 minutes"
+      Namespace: AWS/ApplicationELB
+      MetricName: RequestCount
+      Dimensions:
+        - Name: LoadBalancer
+          Value: !GetAtt ALB.LoadBalancerFullName
+      Statistic: Sum
+      Period: 300
+      EvaluationPeriods: 1
+      Threshold: 100000
+      ComparisonOperator: GreaterThanThreshold
+      AlarmActions:
+        - !Ref SNSTopic
+      OKActions:
+        - !Ref SNSTopic
+
+  SNSTopic:
+    Type: AWS::SNS::Topic
+    Properties:
+      DisplayName: "Ecom Monitoring Alerts"
+
+  SNSTopicSubscription:
+    Type: AWS::SNS::Subscription
+    Properties:
+      TopicArn: !Ref SNSTopic
+      Protocol: email
+      Endpoint: "22ug2-0190M@sltc.edu.lk"
 
 Outputs:
   ALBURL:
